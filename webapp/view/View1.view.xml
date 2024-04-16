@@ -1,0 +1,119 @@
+<mvc:View
+    xmlns:layout="sap.ui.layout"
+    controllerName="zappcursorick.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+    xmlns:SmartFilter="sap.ui.comp.smartfilterbar"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+>
+    <Page
+        id="page"
+        title="{i18n>title}"
+    >
+        <SmartFilter:SmartFilterBar
+            id="SF_Alunos"
+            persistencyKey="SmartTablePKey"
+            useToolbar="false"
+            entitySet="AlunosFioriSet"
+            visible="true"
+        >
+            <SmartFilter:controlConfiguration>
+                <SmartFilter:ControlConfiguration
+                    key="Usuario"
+                    index="0"
+                    label="Usuario"
+                    groupId="_BASIC"
+                    width="auto"
+                    visibleInAdvancedArea="true"
+                />
+                <SmartFilter:ControlConfiguration
+                    key="Nome"
+                    index="1"
+                    label="Nome"
+                    groupId="_BASIC"
+                    width="auto"
+                    visibleInAdvancedArea="true"
+                />
+            </SmartFilter:controlConfiguration>
+        </SmartFilter:SmartFilterBar>
+
+        <smartTable:SmartTable
+            entitySet="AlunosFioriSet"
+            smartFilterId="SF_Alunos"
+            useExportToExcel="true"
+            useVariantManagement="true"
+            useTablePersonalisation="true"
+            header="Alunos"
+            showRowCount="true"
+            showFullScreenButton="true"
+            enableAutoBinding="true"
+            requestAtLeastFields="Usuario,Nome,Email,ProjetoSegw"
+            persistencyKey="SmartTablePKey1"
+        >
+            <smartTable:customToolbar>
+                <OverflowToolbar design="Transparent">
+                    <ToolbarSpacer />
+                    <OverflowToolbarButton
+                        id="barcodeID"
+                        icon="sap-icon://bar-code"
+                        press="CodeScan"
+                    />
+                </OverflowToolbar>
+            </smartTable:customToolbar>
+            <Table
+                growing="true"
+                growingThreshold="100"
+                mode="None"
+                id="table2"
+                enableBusyIndicator="true"
+                busyIndicatorDelay="100"
+            >
+                <columns>
+                    <Column>
+                        <Text
+                            text="Usuário"
+                        />
+                    </Column>
+                    <Column>
+                        <Text
+                            text="Nome"
+                        />
+                    </Column>
+                    <Column>
+                        <Text
+                            text="Email"
+                        />
+                    </Column>
+                    <Column>
+                        <Text
+                            text="ProjetoSegw"
+                        />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem
+                        type="Navigation"
+                        press=".onNavega"
+                    >
+                        <cells>
+                            <Input value="{Usuario}" editable="false"/>
+                            <Input value="{Nome}" editable="false"/>
+                            <Input value="{Email}" editable="false"/>
+                            <Input value="{ProjetoSegw}" editable="false"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+
+            <smartTable:layoutData>
+                <FlexItemData
+                    growFactor="1"
+                    baseSize="0%"
+                />
+            </smartTable:layoutData>
+        </smartTable:SmartTable>
+    </Page>
+</mvc:View>
