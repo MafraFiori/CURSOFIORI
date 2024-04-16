@@ -105,8 +105,10 @@
                                 <Input
                                     width="100%"
                                     placeholder="CEP"
-                                    value="{CEP}"
+                                    value="{Cep}"
                                     editable="{Auxiliar>/editable}"
+                                    change="onChangeCEP"
+                                    id="idCep"
                                 />
                             </f:FormElement>
                             <f:FormElement label="Endereço">
@@ -115,6 +117,7 @@
                                     placeholder="Endereço"
                                     value="{Endereco}"
                                     editable="{Auxiliar>/editable}"
+                                    id="idEndereco"
                                 />
                             </f:FormElement>
                             <f:FormElement label="Bairro">
@@ -123,6 +126,7 @@
                                     placeholder="Bairro"
                                     value="{Bairro}"
                                     editable="{Auxiliar>/editable}"
+                                    id="idBairro"
                                 />
                             </f:FormElement>
                         </f:formElements>

@@ -78,6 +78,9 @@ sap.ui.define([
             },
 
             onCancela: function () {
+                let oModel = this.getView().getModel()
+                oModel.refresh()
+                
                 let that = this
                 sap.m.MessageBox.alert("Confirma o cancelamento da edição?", {
                     actions: ["Sim", "Não"],
@@ -98,13 +101,19 @@ sap.ui.define([
                 let idNome = this.getView().byId("idNome").getValue()
                 let Email = this.getView().byId("Email").getValue()
                 let ProjetoSegw = this.getView().byId("ProjetoSegw").getValue()
+                let idCep = this.getView().byId("idCep").getValue()
+                let idEndereco = this.getView().byId("idEndereco").getValue()
+                let idBairro = this.getView().byId("idBairro").getValue()
                 let that = this
                 let chave = this.getView().byId("Usuario").getValue()
 
                 let objeto = {
                     Nome: idNome,
                     ProjetoSegw: ProjetoSegw,
-                    Email: Email
+                    Email: Email,
+                    Cep: idCep,
+                    Endereco: idEndereco,
+                    Bairro: idBairro
                 }
 
                 this.getView().getModel().update("/AlunosFioriSet('" + chave + "')", objeto, {
@@ -122,8 +131,26 @@ sap.ui.define([
                         sap.m.MessageBox.error("Erro ao atualizar o aluno !!!");
                     }
                 });
+            },
+
+            onChangeCEP: function(){
+                let that = this
+                let idCep = this.getView().byId("idCep").getValue()
+                var url = "https://viacep.com.br/ws/" + idCep + "/json/";
+                $.ajax({
+                    url: url,
+                    dataType: "jsonp",
+                    success: function (response) {
+                        let cep = response.cep
+                        let endereco = response.logradouro
+                        let bairro = response.bairro
+                        that.getView().byId("idCep").setValue(cep)
+                        that.getView().byId("idEndereco").setValue(endereco)
+                        that.getView().byId("idBairro").setValue(bairro)
+                    },
+                    error: function () {
+                    }
+                });
             }
-
-
         });
     });
