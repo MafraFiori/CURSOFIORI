@@ -22,8 +22,15 @@ sap.ui.define(
 
       getRouter: function () {
         return this.getOwnerComponent().getRouter();
-      }
+      },
 
+      navButtonPressed: function () {
+        window.history.back()
+      },
+
+      getModel: function (sName) {
+        return this.getView().getModel(sName);
+      },
 
     });
   }
