@@ -80,7 +80,7 @@ sap.ui.define([
             onCancela: function () {
                 let oModel = this.getView().getModel()
                 oModel.refresh()
-                
+
                 let that = this
                 sap.m.MessageBox.alert("Confirma o cancelamento da edição?", {
                     actions: ["Sim", "Não"],
@@ -136,11 +136,16 @@ sap.ui.define([
             onChangeCEP: function(){
                 let that = this
                 let idCep = this.getView().byId("idCep").getValue()
+                let oModel = this.getView().getModel()
                 var url = "https://viacep.com.br/ws/" + idCep + "/json/";
                 $.ajax({
                     url: url,
                     dataType: "jsonp",
+                    beforeSend: function (xhr) {
+                        oModel.setProperty("/busy", true)
+                    },
                     success: function (response) {
+                        oModel.setProperty("/busy", false)
                         let cep = response.cep
                         let endereco = response.logradouro
                         let bairro = response.bairro
@@ -149,6 +154,7 @@ sap.ui.define([
                         that.getView().byId("idBairro").setValue(bairro)
                     },
                     error: function () {
+                        oModel.setProperty("/busy", false)
                     }
                 });
             }

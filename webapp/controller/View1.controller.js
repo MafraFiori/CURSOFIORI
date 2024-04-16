@@ -204,6 +204,100 @@ sap.ui.define([
                     }
                 }
 
+            },
+
+            onChangeArquivo: function (oEvent) {
+                let file = oEvent.mParameters.files[0];
+                let tipoArquivo = oEvent.mParameters.files[0].type;
+                let oModel = this.getView().getModel();
+                let oModelAuxiliar = this.getView().getModel("Auxiliar")
+                let that = this
+
+                if (tipoArquivo !== "text/csv") {
+                    MessageBox.error("Seram aceitos apenas arquivos CSV.");
+                    return;
+                }
+
+                var reader = new FileReader();
+                reader.readAsText(file);
+
+                reader.onload = function () {
+                    let texto = reader.result;
+                    let linhas = texto.split("\r\n");
+                    let lengthLinhas = linhas.length;
+
+                    let Cabecalho = linhas[0].split(";");
+
+                    if (Cabecalho[0] !== "Usuario") {
+                        sap.m.MessageBox.error(
+                            "A primeira coluna do CSV, deverá ser 'Usuario'."
+                        );
+                        return;
+                    }
+
+                    if (Cabecalho[1] !== "Nome") {
+                        sap.m.MessageBox.error(
+                            "A segunda coluna do CSV, deverá ser 'Nome'."
+                        );
+                        return;
+                    }
+
+                    if (Cabecalho[2] !== "Email") {
+                        sap.m.MessageBox.error(
+                            "A terceira coluna do CSV, deverá ser 'Email'."
+                        );
+                        return;
+                    }
+
+                    if (Cabecalho[3] !== "Projeto SEGW") {
+                        sap.m.MessageBox.error("A quarta coluna do CSV, deverá ser 'Projeto SEGW'.");
+                        return;
+                    }
+
+                    for (let i = 0; i < lengthLinhas; i++) {
+                        if (i !== 0) {
+                            let split = linhas[i].split(";");
+                            let objeto = {
+                                Usuario: split[0],
+                                Nome: split[1],
+                                Email: split[2],
+                                ProjetoSegw: split[3]
+                            };
+                            if (objeto.Usuario !== "") {
+                                oModel.create('/AlunosFioriSet', objeto, {
+                                    success: function (oData, oReponse) {
+                                        let arrayMsg = {
+                                            type: "Success",
+                                            title: "Aluno incluido com sucesso !!!",
+                                            activeTitle: true,
+                                            description: "O aluno " + objeto.Usuario + " foi incluido com sucesso!!!",
+                                        }
+                                        oModelAuxiliar.oData.Menssagens.push(arrayMsg);
+                                        oModelAuxiliar.refresh(true);
+    
+                                        that.byId("messagePopoverBtn").setType("Accept");
+                                        oMessagePopover.openBy(that.getView().byId("messagePopoverBtn"));
+                                        that.CancelarAdicionar()
+                                    },
+                                    error: function (oError) {
+                                        let arrayMsg = {
+                                            type: "Error",
+                                            title: "Erro ao incluir aluno !!!",
+                                            activeTitle: true,
+                                            description: "Erro ao incluir aluno " + objeto.Usuario + " !!!",
+                                        }
+                                        oModelAuxiliar.oData.Menssagens.push(arrayMsg);
+                                        oModelAuxiliar.refresh(true);
+    
+                                        that.byId("messagePopoverBtn").setType("Accept");
+                                        oMessagePopover.openBy(that.getView().byId("messagePopoverBtn"));
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    oModel.refresh()
+                };
             }
 
         });
