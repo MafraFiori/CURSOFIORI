@@ -88,10 +88,6 @@
                                     id="Email"
                                 />
                             </f:FormElement>
-                        </f:formElements>
-                    </f:FormContainer>
-                    <f:FormContainer id="FormContainer">
-                        <f:formElements>
                             <f:FormElement label="ProjetoSegw">
                                 <Input
                                     width="100%"
@@ -99,6 +95,34 @@
                                     value="{ProjetoSegw}"
                                     editable="{Auxiliar>/editable}"
                                     id="ProjetoSegw"
+                                />
+                            </f:FormElement>
+                        </f:formElements>
+                    </f:FormContainer>
+                    <f:FormContainer id="FormContainer">
+                        <f:formElements>
+                            <f:FormElement label="CEP">
+                                <Input
+                                    width="100%"
+                                    placeholder="CEP"
+                                    value="{CEP}"
+                                    editable="{Auxiliar>/editable}"
+                                />
+                            </f:FormElement>
+                            <f:FormElement label="Endereço">
+                                <Input
+                                    width="100%"
+                                    placeholder="Endereço"
+                                    value="{Endereco}"
+                                    editable="{Auxiliar>/editable}"
+                                />
+                            </f:FormElement>
+                            <f:FormElement label="Bairro">
+                                <Input
+                                    width="100%"
+                                    placeholder="Bairro"
+                                    value="{Bairro}"
+                                    editable="{Auxiliar>/editable}"
                                 />
                             </f:FormElement>
                         </f:formElements>
