@@ -20,11 +20,18 @@
         "uri": "/sap/opu/odata/sap/ZG_CURSO_FIORI_RA_SRV/",
         "type": "OData",
         "settings": {
-          "annotations": [],
+          "annotations": ["annotation0"],
           "localUri": "localService/metadata.xml",
           "odataVersion": "2.0"
         }
-      }
+      },
+      "annotation0": {
+        "type": "ODataAnnotation",
+        "uri": "localService/annotation0.xml",
+        "settings": {
+            "localUri": "localService/annotation0.xml"
+        }
+    }
     }
   },
   "sap.ui": {

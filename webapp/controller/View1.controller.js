@@ -3,12 +3,15 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/library",
     "sap/m/MessagePopover",
+    'sap/ui/table/Column',
+    'sap/ui/model/FilterOperator',
+    "sap/ui/model/Filter",
     "sap/m/MessageItem"
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, JSONModel, MLibrary, MessagePopover, MessageItem) {
+    function (Controller, JSONModel, MLibrary, MessagePopover, UIColumn, FilterOperator,  Filter, MessageItem,) {
         "use strict";
 
         var oMessagePopover;
@@ -16,6 +19,122 @@ sap.ui.define([
         return Controller.extend("zappcursorick.controller.View1", {
             onInit: function () {
                 this.criaModeloAuxiliar()
+            },
+
+            onValueHelpUser: function () {
+
+                if (!this.pDialog) {
+                    this.pDialog = this.loadFragment({
+                        name: "zappcursorick.view.fragmentos.ValueHelpUser"
+                    });
+                }
+                this.pDialog.then(function (oDialog) {
+                    var oFilterBar = oDialog.getFilterBar();
+                    this._oVHD = oDialog;
+                    // Initialise the dialog with model only the first time. Then only open it
+                    if (this._bDialogInitialized) {
+                        // Re-set the tokens from the input and update the table
+                        oDialog.open();
+                        return;
+                    }
+                    this.getView().addDependent(oDialog);
+
+                    // Set Basic Search for FilterBar
+                    oFilterBar.setFilterBarExpanded(true);
+                    oDialog.getTableAsync().then(function (oTable) {
+
+                        oTable.setModel(this.oProductsModel);
+                        // For Desktop and tabled the default table is sap.ui.table.Table
+                        if (oTable.bindRows) {
+                            // Bind rows to the ODataModel and add columns
+                            oTable.bindAggregation("rows", {
+                                path: "/ZshHelpAlunoSet",
+                                events: {
+                                    dataReceived: function () {
+                                        oDialog.update();
+                                    }
+                                }
+                            });
+                            oTable.addColumn(new UIColumn({ label: "Usuario", template: "Usuario" }));
+                            oTable.addColumn(new UIColumn({ label: "Nome", template: "Nome" }));
+                            oTable.addColumn(new UIColumn({ label: "Email", template: "Email" }));
+                        }
+
+                        // For Mobile the default table is sap.m.Table
+                        if (oTable.bindItems) {
+                            // Bind items to the ODataModel and add columns
+                            oTable.bindAggregation("items", {
+                                path: "/ZshHelpAlunoSet",
+                                template: new ColumnListItem({
+                                    cells: [new Label({ text: "{Usuario}" }), new Label({ text: "{Nome}" }), new Label({ text: "{Email}" })]
+                                }),
+                                events: {
+                                    dataReceived: function () {
+                                        oDialog.update();
+                                    }
+                                }
+                            });
+                            oTable.addColumn(new MColumn({ header: new Label({ text: "Usuario" }) }));
+                            oTable.addColumn(new MColumn({ header: new Label({ text: "Nome" }) }));
+                            oTable.addColumn(new MColumn({ header: new Label({ text: "Email" }) }));
+                        }
+                        oDialog.update();
+                    }.bind(this));
+
+                    // set flag that the dialog is initialized
+                    this._bDialogInitialized = true;
+                    oDialog.open();
+                }.bind(this));
+            },
+
+            onFilterBarSearchUserA: function (oEvent) {
+                var aSelectionSet = oEvent.getParameter("selectionSet");
+
+                var aFilters = aSelectionSet.reduce(function (aResult, oControl) {
+                    if (oControl.getValue()) {
+                        aResult.push(new Filter({
+                            path: oControl.getName(),
+                            operator: FilterOperator.Contains,
+                            value1: oControl.getValue()
+                        }));
+                    }
+
+                    return aResult;
+                }, []);
+
+
+                this._filterTableA(new Filter({
+                    filters: aFilters,
+                    and: true
+                }));
+            },
+
+            _filterTableA: function (oFilter) {
+                var oVHD = this._oVHD;
+    
+                oVHD.getTableAsync().then(function (oTable) {
+                    if (oTable.bindRows) {
+                        oTable.getBinding("rows").filter(oFilter);
+                    }
+                    if (oTable.bindItems) {
+                        oTable.getBinding("items").filter(oFilter);
+                    }
+    
+                    // This method must be called after binding update of the table.
+                    oVHD.update();
+                });
+            },
+
+            onValueHelpOkPressA: function (oEvent) {
+                var aTokens = oEvent.getParameter("tokens");
+                var sUser = aTokens[0].getProperty("key");
+                this._user =  this.byId("idUserHelp");
+                this._user.setValue(sUser);
+                this._oVHD.close();
+            },
+
+            onValueHelpCancelPressA: function (oEvent) {
+                this._oVHD.close();
             },
 
             criaModeloAuxiliar: function () {
@@ -274,7 +393,7 @@ sap.ui.define([
                                         }
                                         oModelAuxiliar.oData.Menssagens.push(arrayMsg);
                                         oModelAuxiliar.refresh(true);
-    
+
                                         that.byId("messagePopoverBtn").setType("Accept");
                                         oMessagePopover.openBy(that.getView().byId("messagePopoverBtn"));
                                         that.CancelarAdicionar()
@@ -288,7 +407,7 @@ sap.ui.define([
                                         }
                                         oModelAuxiliar.oData.Menssagens.push(arrayMsg);
                                         oModelAuxiliar.refresh(true);
-    
+
                                         that.byId("messagePopoverBtn").setType("Accept");
                                         oMessagePopover.openBy(that.getView().byId("messagePopoverBtn"));
                                     }
