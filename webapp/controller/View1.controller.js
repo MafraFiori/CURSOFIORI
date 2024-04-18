@@ -11,7 +11,7 @@ sap.ui.define([
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, JSONModel, MLibrary, MessagePopover, UIColumn, FilterOperator,  Filter, MessageItem,) {
+    function (Controller, JSONModel, MLibrary, MessagePopover, UIColumn, FilterOperator, Filter, MessageItem,) {
         "use strict";
 
         var oMessagePopover;
@@ -111,7 +111,7 @@ sap.ui.define([
 
             _filterTableA: function (oFilter) {
                 var oVHD = this._oVHD;
-    
+
                 oVHD.getTableAsync().then(function (oTable) {
                     if (oTable.bindRows) {
                         oTable.getBinding("rows").filter(oFilter);
@@ -119,7 +119,7 @@ sap.ui.define([
                     if (oTable.bindItems) {
                         oTable.getBinding("items").filter(oFilter);
                     }
-    
+
                     // This method must be called after binding update of the table.
                     oVHD.update();
                 });
@@ -128,7 +128,7 @@ sap.ui.define([
             onValueHelpOkPressA: function (oEvent) {
                 var aTokens = oEvent.getParameter("tokens");
                 var sUser = aTokens[0].getProperty("key");
-                this._user =  this.byId("idUserHelp");
+                this._user = this.byId("idUserHelp");
                 this._user.setValue(sUser);
                 this._oVHD.close();
             },
@@ -260,48 +260,67 @@ sap.ui.define([
                 let Email = this.adicionar.mAggregations.content[2].getValue()
                 let Projeto = this.adicionar.mAggregations.content[3].getValue()
 
-                sap.m.MessageBox.alert("Confirma a inclusão?", {
-                    actions: ["Sim", "Não"],
-                    onClose: function (sAction) {
-                        if (sAction == "Sim") {
-                            let objeto = {
-                                Usuario: Usuario,
-                                Nome: Nome,
-                                ProjetoSegw: Projeto,
-                                Email: Email
-                            }
-                            oModel.create('/AlunosFioriSet', objeto, {
-                                success: function (oData, oReponse) {
-                                    let arrayMsg = {
-                                        type: "Success",
-                                        title: "Aluno incluido com sucesso !!!",
-                                        activeTitle: true,
-                                        description: "O aluno " + Usuario + " foi incluido com sucesso!!!",
-                                    }
-                                    oModelAuxiliar.oData.Menssagens.push(arrayMsg);
-                                    oModelAuxiliar.refresh(true);
+                var oDados = {
+                    "Usuario": Usuario
+                }
 
-                                    that.byId("messagePopoverBtn").setType("Accept");
-                                    oMessagePopover.openBy(that.getView().byId("messagePopoverBtn"));
-                                    that.CancelarAdicionar()
-                                },
-                                error: function (oError) {
-                                    let arrayMsg = {
-                                        type: "Error",
-                                        title: "Erro ao incluir aluno !!!",
-                                        activeTitle: true,
-                                        description: "Erro ao incluir aluno " + Usuario + " !!!",
-                                    }
-                                    oModelAuxiliar.oData.Menssagens.push(arrayMsg);
-                                    oModelAuxiliar.refresh(true);
+                this.getView().getModel().callFunction('/GetUserExist', {                    
+                    method: "GET",
+                    urlParameters: oDados,
+                    success: function (oData, oReponse) {
+                        if (oData.Ok === '') {
+                            sap.m.MessageBox.alert("Confirma a inclusão?", {
+                                actions: ["Sim", "Não"],
+                                onClose: function (sAction) {
+                                    if (sAction == "Sim") {
+                                        let objeto = {
+                                            Usuario: Usuario,
+                                            Nome: Nome,
+                                            ProjetoSegw: Projeto,
+                                            Email: Email
+                                        }
+                                        oModel.create('/AlunosFioriSet', objeto, {
+                                            success: function (oData, oReponse) {
+                                                let arrayMsg = {
+                                                    type: "Success",
+                                                    title: "Aluno incluido com sucesso !!!",
+                                                    activeTitle: true,
+                                                    description: "O aluno " + Usuario + " foi incluido com sucesso!!!",
+                                                }
+                                                oModelAuxiliar.oData.Menssagens.push(arrayMsg);
+                                                oModelAuxiliar.refresh(true);
 
-                                    that.byId("messagePopoverBtn").setType("Accept");
-                                    oMessagePopover.openBy(that.getView().byId("messagePopoverBtn"));
+                                                that.byId("messagePopoverBtn").setType("Accept");
+                                                oMessagePopover.openBy(that.getView().byId("messagePopoverBtn"));
+                                                that.CancelarAdicionar()
+                                            },
+                                            error: function (oError) {
+                                                let arrayMsg = {
+                                                    type: "Error",
+                                                    title: "Erro ao incluir aluno !!!",
+                                                    activeTitle: true,
+                                                    description: "Erro ao incluir aluno " + Usuario + " !!!",
+                                                }
+                                                oModelAuxiliar.oData.Menssagens.push(arrayMsg);
+                                                oModelAuxiliar.refresh(true);
+
+                                                that.byId("messagePopoverBtn").setType("Accept");
+                                                oMessagePopover.openBy(that.getView().byId("messagePopoverBtn"));
+                                            }
+                                        });
+                                    }
                                 }
-                            });
+                            })
+                        } else {
+                            sap.m.MessageBox.error(that.getView().getModel("i18n").getResourceBundle().getText("msgErroAlunoExist"));
                         }
+                    },
+                    error: function (oError) {
+                        sap.m.MessageBox.error(that.getView().getModel("i18n").getResourceBundle().getText("lblMsgCreateError"));
                     }
-                })
+                });
+
+
             },
 
             handleMessagePopoverPress: function () {
